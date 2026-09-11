@@ -2,12 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import Midtrans from "midtrans-client";
 import _ from "lodash";
 import { prisma } from "@/lib/prisma";
+import midtransClient from "midtrans-client";
 
-const snap = new Midtrans.Snap({
+const coreApi = new midtransClient.CoreApi({
   isProduction: false,
   serverKey: process.env.MIDTRANS_SERVER_KEY,
   clientKey: process.env.MIDTRANS_CLIENT_KEY,
 });
+
+enum Banks {
+  bca = "bca",
+  bni = "bni",
+}
 
 interface OrderItemRequest {
   order_Item_id: number;
@@ -19,11 +25,19 @@ interface OrderItemRequest {
   };
 }
 
+interface OrderRequest {
+  orderItems: OrderItemRequest[];
+  payment_type: string;
+  bank_transfer: {
+    bank: Banks;
+  };
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const data: OrderItemRequest[] = await req.json();
+    const data: OrderRequest = await req.json();
 
-    if (!data || data.length === 0) {
+    if (!data || data.orderItems.length === 0) {
       return NextResponse.json(
         {
           success: false,
@@ -39,7 +53,7 @@ export async function POST(req: NextRequest) {
     // 1. Get actual products from DB
     // --------------------------------
 
-    const productIds = data.map((item) => item.product.id);
+    const productIds = data.orderItems.map((item) => item.product.id);
 
     const products = await prisma.product.findMany({
       where: {
@@ -53,7 +67,7 @@ export async function POST(req: NextRequest) {
     // 2. Validate products
     // --------------------------------
 
-    if (products.length !== data.length) {
+    if (products.length !== data.orderItems.length) {
       return NextResponse.json(
         {
           success: false,
@@ -67,7 +81,7 @@ export async function POST(req: NextRequest) {
     // 3. Create order items
     // --------------------------------
 
-    const orderItems = data.map((item) => {
+    const orderItems = data.orderItems.map((item) => {
       const product = products.find(
         (product) => product.id === item.product.id,
       );
@@ -82,6 +96,9 @@ export async function POST(req: NextRequest) {
         price: product.price,
       };
     });
+
+    const paymentType = data.payment_type;
+    const bank = data.bank_transfer.bank;
 
     // --------------------------------
     // 4. Calculate gross amount
@@ -103,6 +120,8 @@ export async function POST(req: NextRequest) {
         items: {
           create: orderItems,
         },
+        payment_type: paymentType,
+        payment_name: bank,
       },
 
       include: {
@@ -138,11 +157,16 @@ export async function POST(req: NextRequest) {
         order_id: order.order_id,
         gross_amount: Math.ceil(order.gross_amount),
       },
+
+      payment_type: paymentType,
+      bank_transfer: {
+        bank: bank,
+      },
     };
 
     console.log("Midtrans parameter:", parameter);
 
-    const token = await snap.createTransactionToken(parameter);
+    const token = await coreApi.charge(parameter);
 
     // --------------------------------
     // 8. Return result
@@ -150,13 +174,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-
       orderId: order.order_id,
-
       status: order.status,
-
       grossAmount: order.gross_amount,
-
       token,
     });
   } catch (error) {

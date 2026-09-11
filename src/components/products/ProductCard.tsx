@@ -3,7 +3,8 @@ import Link from "next/link";
 interface Product {
   id: number;
   name: string;
-  description: string | null;
+  description?: string | null;
+  jumlah: number;
   price: number;
 }
 
@@ -13,21 +14,29 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   return (
-    <div className="rounded-lg border border-white p-5">
-      <h2 className="text-xl font-semibold">{product.name}</h2>
+    // whole card is clickable, like etsy
+    <Link href={`/products/${product.id}`} className="group block">
+      {/* image placeholder (product has no image yet) */}
+      <div className="flex aspect-4/5 items-center justify-center rounded-lg bg-subtle font-serif text-6xl text-muted transition group-hover:shadow-lg">
+        {product.name.charAt(0).toUpperCase()}
+      </div>
 
-      <p className="mt-2 text-gray-600">{product.description}</p>
+      <h2 className="mt-2 truncate text-base">{product.name}</h2>
 
-      <p className="mt-3 font-bold">
+      <p className="truncate text-base text-muted">
+        Jumlah : {product.jumlah}
+        {product.description && ` · ${product.description}`}
+      </p>
+
+      <p className="mt-1 text-lg font-bold">
         Rp {product.price.toLocaleString("id-ID")}
       </p>
 
-      <Link
-        href={`/products/${product.id}`}
-        className="mt-4 inline-block rounded bg-black px-4 py-2 text-white"
-      >
-        View
-      </Link>
-    </div>
+      {product.jumlah <= 5 && (
+        <p className="text-sm font-semibold text-accent">
+          Only {product.jumlah} left
+        </p>
+      )}
+    </Link>
   );
 }

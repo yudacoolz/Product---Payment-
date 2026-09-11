@@ -9,6 +9,7 @@ type ProductOrder = {
 type CartStore = {
   cart: ProductOrder[];
   addToCart: (product: Product, jumlah: number) => void;
+  updateCartItem: (productId: number, jumlah: number) => void;
   removeFromCart: (id: number) => void;
 };
 
@@ -18,6 +19,13 @@ export const useCartStore = create<CartStore>((set) => ({
   addToCart: (product, jumlah) =>
     set((state) => ({
       cart: [...state.cart, { product: product, jumlah: jumlah }],
+    })),
+
+  updateCartItem: (productId, jumlah) =>
+    set((state) => ({
+      cart: state.cart.map((item) =>
+        item.product.id === productId ? { ...item, jumlah } : item,
+      ),
     })),
 
   removeFromCart: (id) =>

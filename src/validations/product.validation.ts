@@ -6,6 +6,7 @@ export const createProductSchema = z.object({
   description: z.string().trim().min(1, "Description is required"),
 
   price: z.coerce.number().positive("Price must be greater than 0"),
+  jumlah: z.coerce.number().positive("Jumlah must be greater than 0"),
 });
 
 export const updateProductSchema = createProductSchema.partial();

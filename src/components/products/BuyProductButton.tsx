@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { ShoppingCart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createOrder } from "@/services/order.service";
 import { useCartStore } from "@/stores/cart-store";
 import { Product } from "@/types/product";
+import { createCartItem } from "@/services/cart.service";
 
 interface BuyProductButtonProps {
   product: Product;
@@ -49,7 +51,11 @@ export default function BuyProductButton({
     setError(null);
 
     try {
-      addToCart(product, quantity);
+      // addToCart(product, quantity);
+      const addToCart = await createCartItem({
+        productId: product.id,
+        jumlah: quantity,
+      });
     } catch (err) {
       console.log(err);
     } finally {
@@ -96,22 +102,23 @@ export default function BuyProductButton({
       <button
         type="button"
         onClick={handleModal}
-        className="rounded-lg border px-4 py-2 bg-blue-500 text-white"
+        className="flex w-full items-center justify-center gap-2 rounded-full border-2 border-foreground bg-background px-6 py-3 font-semibold text-foreground shadow-sm transition duration-200 hover:scale-102 hover:shadow-lg active:scale-100"
       >
-        Add to Cart
+        <ShoppingCart className="h-5 w-5" />
+        Add to cart
       </button>
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black opacity-30"
+            className="absolute inset-0 bg-black/40"
             onClick={handleModal}
           />
 
           {/* Modal */}
-          <div className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
-            <h2 className="text-lg font-bold text-black">
+          <div className="relative w-full max-w-md rounded-2xl bg-card p-6 shadow-xl">
+            <h2 className="font-serif text-2xl">
               Order {product.name}
             </h2>
 
@@ -143,7 +150,7 @@ export default function BuyProductButton({
               </div> */}
 
               <div>
-                <label className="mb-2 block font-medium text-black">
+                <label className="mb-2 block text-sm font-semibold">
                   Quantity
                 </label>
 
@@ -154,13 +161,16 @@ export default function BuyProductButton({
                   onChange={(e) =>
                     setQuantity(Math.max(1, e.target.valueAsNumber || 1))
                   }
-                  className="w-full rounded border p-2 text-black"
+                  className="w-full rounded-full border border-line px-4 py-2 focus:border-accent focus:outline-none"
                   required
                 />
               </div>
 
-              <p className="font-bold text-black">
-                Total: Rp {totalValue.toLocaleString("id-ID")}
+              <p className="flex justify-between border-t border-line pt-4 font-semibold">
+                Total
+                <span className="text-xl font-bold text-accent">
+                  Rp {totalValue.toLocaleString("id-ID")}
+                </span>
               </p>
 
               {error && <p className="text-sm text-red-600">{error}</p>}
@@ -169,7 +179,7 @@ export default function BuyProductButton({
                 <button
                   type="submit"
                   disabled={loading}
-                  className="rounded-lg border px-4 py-2 bg-blue-500 text-white disabled:opacity-50"
+                  className="flex-1 rounded-full bg-foreground px-4 py-3 font-semibold text-background hover:opacity-90 disabled:opacity-40"
                 >
                   {loading ? "Processing..." : "Add this Item to Cart"}
                 </button>
@@ -177,7 +187,7 @@ export default function BuyProductButton({
                 <button
                   type="button"
                   onClick={handleModal}
-                  className="rounded-lg border px-4 py-2 text-black"
+                  className="rounded-full bg-subtle px-5 py-3 font-semibold hover:bg-line"
                 >
                   Cancel
                 </button>

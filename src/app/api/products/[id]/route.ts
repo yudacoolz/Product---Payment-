@@ -56,6 +56,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
         name: body.name,
         description: body.description,
         price: body.price,
+        jumlah: body.jumlah,
       },
     });
 

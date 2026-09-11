@@ -1,5 +1,6 @@
 "use client";
 
+import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -48,8 +49,9 @@ export default function DeleteProductButton({
     <button
       onClick={handleDelete}
       disabled={loading}
-      className="rounded bg-red-600 px-4 py-2 text-white disabled:opacity-50"
+      className="flex items-center gap-2 rounded-full border-2 border-red-200 bg-background px-5 py-3 font-semibold text-red-600 shadow-sm transition duration-200 hover:scale-102 hover:border-red-600 hover:bg-red-600 hover:text-white hover:shadow-lg active:scale-100 disabled:opacity-50"
     >
+      <Trash2 className="h-4 w-4" />
       {loading ? "Deleting..." : "Delete"}
     </button>
   );

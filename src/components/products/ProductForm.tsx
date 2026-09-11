@@ -2,13 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-
-interface Product {
-  id: number;
-  name: string;
-  description: string | null;
-  price: number;
-}
+import { Product } from "@/types/product";
 
 interface ProductFormProps {
   product?: Product;
@@ -23,7 +17,9 @@ export default function ProductForm({ product }: ProductFormProps) {
 
   const [description, setDescription] = useState(product?.description ?? "");
 
-  const [price, setPrice] = useState(product?.price.toString() ?? "");
+  const [price, setPrice] = useState<number | undefined>(product?.price);
+
+  const [jumlah, setJumlah] = useState<number | undefined>(product?.jumlah);
 
   const [loading, setLoading] = useState(false);
 
@@ -46,6 +42,7 @@ export default function ProductForm({ product }: ProductFormProps) {
           name,
           description,
           price,
+          jumlah,
         }),
       });
 
@@ -89,12 +86,24 @@ export default function ProductForm({ product }: ProductFormProps) {
       </div>
 
       <div>
+        <label className="mb-2 block font-medium">Jumlah</label>
+
+        <input
+          type="number"
+          value={jumlah}
+          onChange={(e) => setJumlah(Number(e.target.value))}
+          className="w-full rounded border p-2"
+          required
+        />
+      </div>
+
+      <div>
         <label className="mb-2 block font-medium">Price</label>
 
         <input
           type="number"
           value={price}
-          onChange={(e) => setPrice(e.target.value)}
+          onChange={(e) => setPrice(Number(e.target.value))}
           className="w-full rounded border p-2"
           required
         />
