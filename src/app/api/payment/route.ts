@@ -19,9 +19,22 @@ interface OrderItemRequest {
   };
 }
 
+enum Banks {
+  bca = "bca",
+  bni = "bni",
+}
+interface OrderRequest {
+  orderItems: OrderItemRequest[];
+  payment_type: string;
+  bank_transfer: {
+    bank: Banks;
+  };
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const data: OrderItemRequest[] = await req.json();
+    const body: OrderRequest = await req.json();
+    const data = body?.orderItems;
 
     if (!data || data.length === 0) {
       return NextResponse.json(
@@ -83,6 +96,9 @@ export async function POST(req: NextRequest) {
       };
     });
 
+    const paymentType = body.payment_type;
+    const bank = body.bank_transfer.bank;
+
     // --------------------------------
     // 4. Calculate gross amount
     // --------------------------------
@@ -103,6 +119,9 @@ export async function POST(req: NextRequest) {
         items: {
           create: orderItems,
         },
+
+        payment_type: paymentType,
+        payment_name: bank,
       },
 
       include: {
@@ -146,6 +165,16 @@ export async function POST(req: NextRequest) {
 
     // --------------------------------
     // 8. Return result
+    // --------------------------------
+
+    await prisma.order.update({
+      where: { order_id: order.order_id },
+      data: {
+        snap_token: token,
+      },
+    });
+    // --------------------------------
+    // 9. Return result
     // --------------------------------
 
     return NextResponse.json({

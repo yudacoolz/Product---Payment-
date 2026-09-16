@@ -3,8 +3,16 @@ import { Product } from "./product";
 export interface Order {
   order_id: number;
   status: string;
-  gross_ammount: number;
+  gross_amount: number;
+
+  snap_token: string;
+
   items: OrderItem[];
+
+  createdAt: Date;
+  updatedAt: Date;
+  payment_type: string;
+  payment_name: string;
 }
 
 export interface OrderItem {

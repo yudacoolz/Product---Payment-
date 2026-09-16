@@ -1,8 +1,9 @@
 "use client";
 
-import { createOrder } from "@/services/order.service";
+import { createNotification, createOrder } from "@/services/order.service";
 import { useCartStore } from "@/stores/cart-store";
 import { OrderItem } from "@/types/order";
+import { CreateNotifDto } from "@/validations/notification.validation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -13,8 +14,8 @@ declare global {
       pay: (
         token: string,
         options?: {
-          onSuccess?: (result: unknown) => void;
-          onPending?: (result: unknown) => void;
+          onSuccess?: (result: CreateNotifDto) => void;
+          onPending?: (result: CreateNotifDto) => void;
           onError?: (result: unknown) => void;
           onClose?: () => void;
         },
@@ -74,9 +75,12 @@ const checkoutPage = () => {
 
     console.log("orderItems", orderItems);
 
-    let order = {};
+    if (!paymentType) {
+      console.error("payment type is required");
+      return;
+    }
 
-    order = {
+    const order = {
       orderItems: orderItems,
       payment_type: paymentType?.payment_type,
       bank_transfer: {
@@ -88,15 +92,22 @@ const checkoutPage = () => {
 
     try {
       // SNAP //
-      const data = await createOrder(orderItems);
+      const data = await createOrder(order);
 
       // CORE API //
       // const data = await createOrder(order);
 
       console.log("res checkout : ", data);
       window.snap.pay(data.token, {
-        onSuccess: (result) => {
+        onSuccess: async (result) => {
           console.log("SUCCESS:", result);
+          try {
+            await createNotification(result);
+          } catch (err) {
+            console.log(err);
+          }
+
+          router.push("/notification");
         },
 
         onPending: (result) => {

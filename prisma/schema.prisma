@@ -35,6 +35,9 @@ model Order {
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 
+  // snap token, if user want to open snap again (hasn't buy it)
+  snap_token String?
+
   // if you have users/auth later
   // userId  Int
   // user    User      @relation(fields: [userId], references: [id])
@@ -42,6 +45,7 @@ model Order {
   items OrderItem[]
   payment_type String @default("unknown")
   payment_name String @default("unknown")
+
 }
 
 model OrderItem {
@@ -88,4 +92,18 @@ enum OrderStatus {
   EXPIRED
   FAILED
   CANCELLED
+}
+
+model User {
+  user_id String @id @default(uuid())
+  role UserRole @default(CUSTOMER)
+  first_name String
+  email String
+  phone Int
+  password String
+}
+
+enum UserRole {
+  CUSTOMER
+  MERCHANT
 }

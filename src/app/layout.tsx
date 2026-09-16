@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
 
 // Etsy uses "Graphik" (paid font), Inter is the closest free one
 const inter = Inter({
@@ -33,7 +32,6 @@ export default function RootLayout({
           src={snapScriptUrl}
           data-client-key={process.env.MIDTRANS_CLIENT_KEY}
         />
-        <Navbar />
 
         {children}
       </body>
