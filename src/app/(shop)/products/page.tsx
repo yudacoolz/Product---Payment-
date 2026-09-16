@@ -1,10 +1,21 @@
+"use client";
+
 import ProductCard from "@/components/products/ProductCard";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { getProducts } from "@/services/product.service";
+import { useEffect, useState } from "react";
+import { Product } from "@/types/product";
 
-export default async function ProductsPage() {
-  const products = await getProducts();
+export default function ProductsPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await getProducts();
+      setProducts(res);
+    };
+    fetchData();
+  }, []);
   console.log("products: ", products);
 
   return (
