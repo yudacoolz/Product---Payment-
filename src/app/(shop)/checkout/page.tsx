@@ -43,17 +43,24 @@ const checkoutPage = () => {
   const cart = useCartStore.getState().cart;
 
   console.log("cart Store: ", cart);
-  const [changeJumlah, setChangeJumlah] = useState<Record<number, number>>({});
+  const [changeJumlah, setChangeJumlah] = useState<Record<string, number>>({});
   const [grossAmmount, setGrossAmmount] = useState(0);
   const [paymentType, setPaymentType] = useState<PaymentType | null>(null);
 
-  const intitialJumlah: Record<number, number> = {};
+  const intitialJumlah: Record<string, number> = {};
+
+  //  output changeJumlah :
+  // {
+  //   0f972ff3-f45d-4c4a-9444-76a27561dfc5 : 2
+  //   52012358-45ad-4ce6-8a91-12e127621e9c : 1
+  // }
 
   useEffect(() => {
     cart.forEach((item) => (intitialJumlah[item.product.id] = item.jumlah));
     setChangeJumlah(intitialJumlah);
   }, []);
-  console.log(changeJumlah);
+  console.log("changeJumlah: ", changeJumlah);
+  console.log("intitialJumlah: ", intitialJumlah);
 
   useMemo(() => {
     let gross_ammount: number = 0;
@@ -67,8 +74,9 @@ const checkoutPage = () => {
   console.log("grossAmmount : ", grossAmmount);
 
   const handleCheckout = async () => {
-    const orderItems: OrderItem[] = cart.map((item, i) => ({
-      order_Item_id: i + 1,
+    const orderItems = cart.map((item, i) => ({
+      // order_Item_id: i + 1,
+      // order_Item_id: item.,
       product: item.product,
       jumlah: changeJumlah[item.product.id] ?? item.jumlah,
     }));

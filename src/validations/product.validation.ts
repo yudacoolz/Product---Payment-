@@ -7,6 +7,16 @@ export const createProductSchema = z.object({
 
   price: z.coerce.number().positive("Price must be greater than 0"),
   jumlah: z.coerce.number().positive("Jumlah must be greater than 0"),
+  coverUrl: z.instanceof(File, {
+    message: "cover is required",
+  }),
+  galleryUrl: z
+    .array(
+      z.instanceof(File, {
+        message: "gallery is required min 2",
+      }),
+    )
+    .min(2),
 });
 
 export const updateProductSchema = createProductSchema.partial();

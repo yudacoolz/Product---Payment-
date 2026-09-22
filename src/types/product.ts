@@ -1,9 +1,11 @@
 export interface Product {
-  id: number;
+  id: string;
   name: string;
   description?: string | null;
-  jumlah: number;
   price: number;
+  jumlah: number;
+  coverUrl: string | null;
+  galleryUrl: string[];
   createdAt: Date;
   updatedAt: Date;
 }

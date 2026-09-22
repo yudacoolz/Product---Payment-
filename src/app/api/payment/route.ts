@@ -13,7 +13,7 @@ interface OrderItemRequest {
   order_Item_id: number;
   jumlah: number;
   product: {
-    id: number;
+    id: string;
     name: string;
     price: number;
   };

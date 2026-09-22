@@ -16,7 +16,7 @@ export interface Order {
 }
 
 export interface OrderItem {
-  order_Item_id: number;
+  orderItemid: number;
   jumlah: number;
   // price     Float
 

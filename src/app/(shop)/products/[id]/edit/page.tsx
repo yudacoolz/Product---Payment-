@@ -15,7 +15,7 @@ export default async function EditProductPage({
 
   const product = await prisma.product.findUnique({
     where: {
-      id: Number(id),
+      id: id,
     },
   });
 

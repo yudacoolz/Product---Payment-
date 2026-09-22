@@ -1,7 +1,7 @@
 import z from "zod";
 
 const productSchema = z.object({
-  id: z.number(),
+  id: z.string(),
   name: z.string(),
   description: z.string().nullable().optional(),
   jumlah: z.number(),
@@ -16,10 +16,10 @@ const bankTransferSchema = z.object({
 
 export const OrderItemsSchema = z.array(
   z.object({
-    order_Item_id: z.coerce
-      .number()
-      .int()
-      .positive("ID must be greater than 0"),
+    // order_Item_id: z.coerce
+    //   .number()
+    //   .int()
+    //   .positive("ID must be greater than 0"),
     jumlah: z.coerce.number().int().positive("Quantity must be greater than 0"),
     product: productSchema,
   }),

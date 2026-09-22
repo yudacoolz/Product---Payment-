@@ -9,8 +9,8 @@ type ProductOrder = {
 type CartStore = {
   cart: ProductOrder[];
   addToCart: (product: Product, jumlah: number) => void;
-  updateCartItem: (productId: number, jumlah: number) => void;
-  removeFromCart: (id: number) => void;
+  updateCartItem: (productId: string, jumlah: number) => void;
+  removeFromCart: (id: string) => void;
 };
 
 export const useCartStore = create<CartStore>((set) => ({

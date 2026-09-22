@@ -16,56 +16,58 @@ datasource db {
 // schema.prisma
 
 model Product {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String?
-  price       Float
-  jumlah      Int      @default(0) // stock quantity
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(uuid())
+  name          String
+  description   String?
+  price         Float
+  jumlah        Int      @default(0) // stock quantity
+  coverUrl      String?
+  galleryUrl    String[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  orderItems OrderItem[]
-  cartItems  CartItem[]
+  orderItems    OrderItem[]
+  cartItems     CartItem[]
 }
 
 model Order {
-  order_id         String         @id @default(uuid())
-  status     OrderStatus @default(PENDING)
+  order_id     String      @id @default(uuid())
+  status       OrderStatus @default(PENDING)
   gross_amount Float
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 
   // snap token, if user want to open snap again (hasn't buy it)
-  snap_token String?
+  snap_token   String?
 
   // if you have users/auth later
   // userId  Int
   // user    User      @relation(fields: [userId], references: [id])
 
-  items OrderItem[]
+  items        OrderItem[]
   payment_type String @default("unknown")
   payment_name String @default("unknown")
 
 }
 
 model OrderItem {
-  orderItemid        Int   @id @default(autoincrement())
-  jumlah    Int   
-  price     Float 
+  orderItemid    String   @id @default(uuid())
+  jumlah         Int   
+  price          Float 
 
-  order_id   String
-  order     Order   @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
+  order_id       String
+  order          Order   @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
 
-  productId Int
-  product   Product @relation(fields: [productId], references: [id])
+  productId      String
+  product        Product @relation(fields: [productId], references: [id])
 
   @@unique([order_id, productId]) // prevent duplicate rows for same product in one order
 }
 
 model Cart {
-  cartId        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  cartId      String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // userId  Int      @unique  // one active cart per user, if you have auth
   // user    User     @relation(fields: [userId], references: [id])
@@ -74,14 +76,14 @@ model Cart {
 }
 
 model CartItem {
-  cartItemId        Int @id @default(autoincrement())
-  jumlah    Int 
+  cartItemId  String @id @default(uuid())
+  jumlah      Int 
 
-  cartId    Int
-  cart      Cart    @relation(fields: [cartId], references: [cartId], onDelete: Cascade)
+  cartId      String
+  cart        Cart    @relation(fields: [cartId], references: [cartId], onDelete: Cascade)
 
-  productId Int
-  product   Product @relation(fields: [productId], references: [id])
+  productId   String
+  product     Product @relation(fields: [productId], references: [id])
 
   @@unique([cartId, productId]) 
 }
@@ -95,15 +97,39 @@ enum OrderStatus {
 }
 
 model User {
-  user_id String @id @default(uuid())
-  role UserRole @default(CUSTOMER)
-  first_name String
-  email String
-  phone Int
-  password String
+  user_id       String @id @default(uuid())
+  role          UserRole @default(CUSTOMER)
+  first_name    String
+  coverUrl      String
+  email         String
+  phone         Int
+  password      String
 }
 
 enum UserRole {
   CUSTOMER
   MERCHANT
 }
+
+enum PhotoCategory {
+  PRODUCTS
+  USER
+}
+
+enum PhotoType {
+  COVER
+  GALLERY
+}
+model Photo {
+  id            String @id @default(uuid())
+  url           String
+  key           String @unique
+  refId         String
+  fileName      String
+  originalName  String
+  size          Int
+  category      PhotoCategory
+  type          PhotoType
+  createdAt     DateTime @default(now())
+}
+

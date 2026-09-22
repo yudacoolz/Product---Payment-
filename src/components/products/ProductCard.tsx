@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   description?: string | null;
   jumlah: number;

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { uploadServiceSB } from "@/services/upload_supabase.service";
 
 interface Params {
   params: Promise<{
@@ -13,7 +14,7 @@ export async function GET(request: NextRequest, { params }: Params) {
 
     const product = await prisma.product.findUnique({
       where: {
-        id: Number(id),
+        id: id,
       },
     });
 
@@ -50,7 +51,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 
     const product = await prisma.product.update({
       where: {
-        id: Number(id),
+        id: id,
       },
       data: {
         name: body.name,
@@ -79,11 +80,33 @@ export async function DELETE(request: NextRequest, { params }: Params) {
   try {
     const { id } = await params;
 
-    await prisma.product.delete({
+    const photosKeys = await prisma.photo.findMany({
       where: {
-        id: Number(id),
+        refId: id,
       },
     });
+
+    const pathKeys = photosKeys.map((item) => item.key);
+
+    console.log("pathKeys.length : ", pathKeys.length);
+
+    if (pathKeys.length > 0) {
+      await uploadServiceSB.deleteByRefId(pathKeys);
+    }
+
+    await prisma.product.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    if (pathKeys.length > 0) {
+      await prisma.photo.deleteMany({
+        where: {
+          refId: id,
+        },
+      });
+    }
 
     return NextResponse.json({
       message: "Product deleted successfully",

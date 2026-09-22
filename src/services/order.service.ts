@@ -1,12 +1,12 @@
 import api from "@/lib/axios";
-import { Order } from "@/types/order";
-import { PaginatedResponse } from "@/types/pagination";
-import { CreateNotifDto } from "@/validations/notification.validation";
-import {
+import type { Order } from "@/types/order";
+import type { PaginatedResponse } from "@/types/pagination";
+import type { CreateNotifDto } from "@/validations/notification.validation";
+import type {
   CreateOrderDto,
   CreateOrderResponse,
 } from "@/validations/order.validation";
-import { PaginationDto } from "@/validations/pagination.validation";
+import type { PaginationDto } from "@/validations/pagination.validation";
 
 export const createOrder = async (
   data: CreateOrderDto,

@@ -6,6 +6,7 @@ import { useCartStore } from "@/stores/cart-store";
 import { useEffect, useState } from "react";
 import { getCarts } from "@/services/cart.service";
 import { Cart } from "@/types/cart";
+import ChatPage from "./chat/Chat";
 
 export default function Navbar() {
   const cart = useCartStore((state) => state.cart);
@@ -77,6 +78,8 @@ export default function Navbar() {
           >
             Users
           </Link>
+
+          <ChatPage />
 
           <Link
             href="/carts"

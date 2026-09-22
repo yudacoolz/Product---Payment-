@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const createCartSchema = z.object({
-  productId: z.coerce.number().positive("productId must available"),
+  productId: z.string(),
   jumlah: z.coerce.number().positive("Jumlah must be greater than 0"),
 });
 

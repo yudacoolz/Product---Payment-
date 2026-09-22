@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface DeleteProductButtonProps {
-  productId: number;
+  productId: string;
 }
 
 export default function DeleteProductButton({

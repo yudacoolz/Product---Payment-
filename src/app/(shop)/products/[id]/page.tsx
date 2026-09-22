@@ -14,11 +14,7 @@ interface ProductPageProps {
 export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { id } = await params;
 
-  const productId = Number(id);
-
-  if (!Number.isInteger(productId)) {
-    notFound();
-  }
+  const productId = id;
 
   const product = await prisma.product.findUnique({
     where: {

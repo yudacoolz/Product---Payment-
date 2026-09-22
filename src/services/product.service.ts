@@ -1,9 +1,5 @@
 import api from "@/lib/axios";
-import {
-  CreateProductDto,
-  UpdateProductDto,
-} from "@/validations/product.validation";
-import { Product } from "@/types/product";
+import type { Product } from "@/types/product";
 
 export const getProducts = async (): Promise<Product[]> => {
   const response = await api.get<Product[]>("/products/");
@@ -18,7 +14,8 @@ export const getProductById = async (id: number): Promise<Product> => {
 };
 
 export const createProduct = async (
-  data: CreateProductDto,
+  // data: CreateProductDto,
+  data: FormData,
 ): Promise<Product> => {
   const response = await api.post<Product>("/products", data);
 
@@ -26,8 +23,9 @@ export const createProduct = async (
 };
 
 export const updateProduct = async (
-  id: number,
-  data: UpdateProductDto,
+  id: string,
+  // data: UpdateProductDto,
+  data: FormData,
 ): Promise<Product> => {
   const response = await api.patch<Product>(`/products/${id}`, data);
 
