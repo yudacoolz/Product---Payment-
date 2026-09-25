@@ -1,28 +1,73 @@
 "use client";
 
 import Link from "next/link";
-import { Gift, Menu, Search, ShoppingCart } from "lucide-react";
+import { Gift, Menu, Search, ShoppingCart, Bell } from "lucide-react";
 import { useCartStore } from "@/stores/cart-store";
 import { useEffect, useState } from "react";
 import { getCarts } from "@/services/cart.service";
 import { Cart } from "@/types/cart";
 import ChatPage from "./chat/Chat";
+import { Order } from "@/types/order";
+import { getOrders } from "@/services/order.service";
 
 export default function Navbar() {
   const cart = useCartStore((state) => state.cart);
   const cartLength = cart.length;
 
   const [cartItems, setCartItems] = useState<Cart>();
+  const [dataOrder, setDataOrder] = useState<Order[]>([]);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await getCarts();
-      console.log("res get carts : ", res);
-      setCartItems(res);
-    };
+    setIsLoading(true);
+    try {
+      const fetchDataCart = async () => {
+        const resCart = await getCarts();
+        console.log("res get carts : ", resCart);
+        setCartItems(resCart);
+      };
+      const fetchDataOrder = async () => {
+        const resOrder = await getOrders({ page, limit });
+        console.log("res get Orders : ", resOrder);
+        setDataOrder(resOrder.data);
+      };
 
-    fetchData();
+      fetchDataCart();
+      fetchDataOrder();
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(true);
+    }
   }, []);
+
+  if (!dataOrder) {
+    return;
+  }
+
+  const totalPendingOrder = dataOrder.filter(
+    (item) => item.status === "PENDING",
+  ).length;
+  const totalFailedOrder = dataOrder.filter(
+    (item) => item.status === "FAILED",
+  ).length;
+  const totalCanceledOrder = dataOrder.filter(
+    (item) => item.status === "CANCELLED",
+  ).length;
+  const totalExpiredOrder = dataOrder.filter(
+    (item) => item.status === "EXPIRED",
+  ).length;
+  const totalSuccessOrder = dataOrder.filter(
+    (item) => item.status === "PAID",
+  ).length;
+
+  const totalStatusOrder =
+    totalPendingOrder +
+    totalFailedOrder +
+    totalExpiredOrder +
+    totalCanceledOrder;
 
   return (
     <header className="bg-background">
@@ -31,7 +76,7 @@ export default function Navbar() {
 
       <nav className="border-b border-line">
         {/* TOP ROW: logo, products, search, users, cart */}
-        <div className="mx-auto flex max-w-7xl items-center gap-4 px-6 py-3">
+        <div className="mx-auto flex max-w-7xl items-center justify-center gap-4 px-6 py-3">
           <Link
             href="/"
             className="shrink-0 font-serif text-3xl text-accent md:text-4xl"
@@ -39,18 +84,18 @@ export default function Navbar() {
             My App
           </Link>
 
-          <Link
+          {/* <Link
             href="/products"
             className="hidden items-center gap-2 rounded-full px-4 py-2 font-semibold hover:bg-subtle md:flex"
           >
             <Menu className="h-5 w-5" />
             Products
-          </Link>
+          </Link> */}
 
           {/* search bar (not connected to search logic yet) */}
           <form
             action="/products"
-            className="flex flex-1 items-center rounded-full border-2 border-foreground py-1 pl-6 pr-1"
+            className="flex items-center rounded-full border-2 border-foreground py-1 pl-6 pr-1 w-[60%]"
           >
             <input
               name="search"
@@ -67,19 +112,20 @@ export default function Navbar() {
 
           <Link
             href="/notification"
-            className="hidden rounded-full px-4 py-2 font-semibold hover:bg-subtle sm:block"
+            className="relative shrink-0 rounded-full p-3 hover:bg-subtle"
           >
-            Notif
+            <Bell className="h-6 w-6" strokeWidth={2.5} />
+            <span className="absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1 text-xs font-bold text-white">
+              {totalStatusOrder}
+            </span>
           </Link>
 
-          <Link
+          {/* <Link
             href="/users"
             className="hidden rounded-full px-4 py-2 font-semibold hover:bg-subtle sm:block"
           >
             Users
-          </Link>
-
-          <ChatPage />
+          </Link> */}
 
           <Link
             href="/carts"
@@ -101,24 +147,24 @@ export default function Navbar() {
             <Gift className="h-4 w-4" />
             All Products
           </Link>
-          <Link
+          {/* <Link
             href="/products/new"
             className="rounded-full px-3 py-1 font-medium hover:bg-subtle"
           >
             Add Product
-          </Link>
-          <Link
+          </Link> */}
+          {/* <Link
             href="/carts"
             className="rounded-full px-3 py-1 font-medium hover:bg-subtle"
           >
             Cart
-          </Link>
-          <Link
+          </Link> */}
+          {/* <Link
             href="/checkout"
             className="rounded-full px-3 py-1 font-medium hover:bg-subtle"
           >
             Checkout
-          </Link>
+          </Link> */}
         </div>
       </nav>
     </header>

@@ -57,7 +57,7 @@ const formatDate = (date: Date) =>
 export default function NotificationPage() {
   const [dataOrder, setDataOrder] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState("ALL");
+  const [activeFilter, setActiveFilter] = useState("PENDING");
   const [openOrder, setOpenOrder] = useState<Order["order_id"] | null>(null);
   const [payingId, setPayingId] = useState<Order["order_id"] | null>(null);
 
@@ -137,6 +137,8 @@ export default function NotificationPage() {
   const pendingCount = dataOrder.filter(
     (item) => item.status === "PENDING",
   ).length;
+
+  const totalPages = Math.round(Number(metaData?.totalPages));
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-8">
@@ -362,6 +364,12 @@ export default function NotificationPage() {
                                 orderItem.product.price * orderItem.jumlah
                               ).toLocaleString("id-ID")}
                             </p>
+                            <Link
+                              href={`/products/${orderItem.product.id}`}
+                              className="rounded p-2 bg-green-500 text-white"
+                            >
+                              Go to Product Page
+                            </Link>
                           </li>
                         ))}
                       </ul>
@@ -392,41 +400,88 @@ export default function NotificationPage() {
       )}
 
       {/* PAGINATION */}
-      <div className="w-full">
-        <p>total Page: {metaData?.totalPages}</p>
-        <p>total Data: {metaData?.total}</p>
-        <div className="flex items-center justify-between w-[60%] border">
-          <button
-            disabled={!metaData?.hasPrevPage}
-            className={`${!metaData?.hasPrevPage ? "bg-red-500" : ""} p-2 border rounded`}
-            onClick={() => setPage(page - 1)}
-          >
-            Prev
-          </button>
-          {Array.from({ length: totalPage }, (_, index) => index + 1).map(
-            (pageNumber) => (
-              <button
-                key={pageNumber}
-                onClick={() => setPage(pageNumber)}
-                className={`${pageNumber === page ? "bg-blue-400 text-white" : "text-slate-600"} p-2 border rounded`}
+      {!loading && metaData && metaData.total > 0 && (
+        <div className="mt-8 flex flex-col gap-4 rounded-2xl border border-line bg-card p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-4">
+            <p className="text-sm text-muted">
+              Showing{" "}
+              <span className="font-semibold text-foreground">
+                {(page - 1) * limit + 1}
+              </span>
+              –
+              <span className="font-semibold text-foreground">
+                {Math.min(page * limit, metaData.total)}
+              </span>{" "}
+              of{" "}
+              <span className="font-semibold text-foreground">
+                {metaData.total}
+              </span>
+            </p>
+
+            <div className="flex items-center gap-2">
+              <label htmlFor="limit" className="text-xs text-muted">
+                Per page
+              </label>
+              <select
+                id="limit"
+                value={limit}
+                onChange={(e) => {
+                  setLimit(Number(e.target.value));
+                  setPage(1);
+                }}
+                className="rounded-full border border-line bg-subtle px-3 py-1.5 text-sm font-semibold outline-none transition hover:bg-line/60 focus:border-accent"
               >
-                {pageNumber}
-              </button>
-            ),
-          )}
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select>
+            </div>
+          </div>
 
-          <button
-            disabled={!metaData?.hasNextPage}
-            className={`${!metaData?.hasNextPage ? "bg-red-500" : ""} p-2 border rounded`}
-            onClick={() => setPage(page + 1)}
-          >
-            Next
-          </button>
+          {/* page controls */}
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              disabled={!metaData.hasPrevPage}
+              onClick={() => setPage((p) => p - 1)}
+              className="rounded-full border border-line px-3 py-2 text-sm font-semibold transition hover:bg-subtle disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+            >
+              Prev
+            </button>
+
+            <div className="flex items-center gap-1">
+              {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+                (pageNumber) => (
+                  <button
+                    key={pageNumber}
+                    type="button"
+                    onClick={() => setPage(pageNumber)}
+                    className={`h-9 w-9 rounded-full text-sm font-semibold transition ${
+                      pageNumber === page
+                        ? "bg-foreground text-background"
+                        : "text-muted hover:bg-subtle hover:text-foreground"
+                    }`}
+                  >
+                    {pageNumber}
+                  </button>
+                ),
+              )}
+            </div>
+
+            <button
+              type="button"
+              disabled={!metaData.hasNextPage}
+              onClick={() => setPage((p) => p + 1)}
+              className="rounded-full border border-line px-3 py-2 text-sm font-semibold transition hover:bg-subtle disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+            >
+              Next
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
-      <PaginationComponent addMessage={handlePesanChild} />
-      <p>{pesanChild}</p>
+      {/* <PaginationComponent addMessage={handlePesanChild} />
+      <p>{pesanChild}</p> */}
     </main>
   );
 }

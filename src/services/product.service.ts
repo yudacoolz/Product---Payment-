@@ -7,7 +7,7 @@ export const getProducts = async (): Promise<Product[]> => {
   return response.data;
 };
 
-export const getProductById = async (id: number): Promise<Product> => {
+export const getProductById = async (id: string): Promise<Product> => {
   const response = await api.get<Product>(`/products/${id}`);
 
   return response.data;

@@ -6,6 +6,7 @@ import { Product } from "@/types/product";
 import { forEach } from "lodash";
 import { createProduct, updateProduct } from "@/services/product.service";
 import { storageUrl } from "@/lib/storage";
+import { GalleryEditor } from "./GalleryEditor";
 
 interface ProductFormProps {
   product?: Product;
@@ -190,11 +191,12 @@ export default function ProductForm({ product }: ProductFormProps) {
           required
         />
 
-        {/* PREVIEW IMG */}
+        {/* PREVIEW COVER */}
         {previewCover && (
           <img src={previewCover} className="rounded border w-40 h-40" />
         )}
 
+        {/* PREVIEW GALLERY */}
         {previewGallery.length > 0 && (
           <div className="flex items-center gap-2">
             {previewGallery.map((item, i) => (
@@ -202,6 +204,11 @@ export default function ProductForm({ product }: ProductFormProps) {
             ))}
           </div>
         )}
+        <p>galeri editor</p>
+        <GalleryEditor
+          initialUrls={previewGallery}
+          onChange={setPreviewGallery}
+        />
       </div>
 
       <button

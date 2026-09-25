@@ -1,12 +1,14 @@
+import { Product } from "@/types/product";
+import Image from "next/image";
 import Link from "next/link";
 
-interface Product {
-  id: string;
-  name: string;
-  description?: string | null;
-  jumlah: number;
-  price: number;
-}
+// interface Product {
+//   id: string;
+//   name: string;
+//   description?: string | null;
+//   jumlah: number;
+//   price: number;
+// }
 
 interface ProductCardProps {
   product: Product;
@@ -18,7 +20,11 @@ export default function ProductCard({ product }: ProductCardProps) {
     <Link href={`/products/${product.id}`} className="group block">
       {/* image placeholder (product has no image yet) */}
       <div className="flex aspect-4/5 items-center justify-center rounded-lg bg-subtle font-serif text-6xl text-muted transition group-hover:shadow-lg">
-        {product.name.charAt(0).toUpperCase()}
+        {product?.coverUrl ? (
+          <img src={product.coverUrl} />
+        ) : (
+          product.name.charAt(0).toUpperCase()
+        )}
       </div>
 
       <h2 className="mt-2 truncate text-base">{product.name}</h2>
